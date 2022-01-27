@@ -17,8 +17,26 @@ async function run() {
     try {
       await client.connect();
       const database = client.db('travelerExp')
+      const usersCollection = database.collection('users') 
       const exprerienceCollection = database.collection('experience')
       
+      // POST all user data in database
+      app.post('/users', async(req, res) => {
+        const data = req.body 
+        const result = await usersCollection.insertOne(data)
+        res.json(result)
+        console.log("user data result", result)
+      })
+
+      // PUT method to update user when signIn with google
+      app.put('/users', async (req, res) => {
+        const user = req.body 
+        const filter = {email: user.email}
+        const options = {upsert: true} 
+        const updateDoc = {$set: user}
+        const result = await usersCollection.updateOne(filter, updateDoc, options)
+        res.json(result)
+    })
       // collect blog data from database
       app.get('/blogs', async(req, res) => {
         const cursor = exprerienceCollection.find({})
@@ -34,6 +52,15 @@ async function run() {
       res.json(result)
       // console.log("single data find result", result)
      })
+
+    //  post user experience in same collection
+    app.post('/blogs', async (req, res) => {
+      const travelerData = req.body 
+      // console.log(productData)
+      const result = await exprerienceCollection.insertOne(travelerData)
+      res.json(result)
+      console.log("user data added result", result)
+  })
 
     } finally {
     //   await client.close();
