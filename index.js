@@ -36,6 +36,30 @@ async function run() {
         const updateDoc = {$set: user}
         const result = await usersCollection.updateOne(filter, updateDoc, options)
         res.json(result)
+      })
+
+      // put method to update user with admin
+      app.put('/users/admin', async (req, res) => {
+        const admin = req.body
+        console.log(admin.email)
+        // console.log("admin data", admin)
+        const filter = {email: admin.email} 
+        const updateDoc = {$set: {role: "admin"}}
+        const result = await usersCollection.updateOne(filter, updateDoc)
+        // console.log("update user result", result)
+        res.json(result)
+      })
+
+      app.get('/users/:email', async (req, res) => {
+        const email = req.params.email
+        // console.log("user email", email)
+        const query = {email: email}
+        const result = await usersCollection.findOne(query)
+        let isAdmin = false 
+        if(result?.role === "admin"){
+            isAdmin = true 
+        }
+        res.json({admin: isAdmin})
     })
       // collect blog data from database
       app.get('/blogs', async(req, res) => {
@@ -75,3 +99,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`secure travel port number ${port}`)
 })
+
+// heroku main: https://secret-depths-81352.herokuapp.com/ 
