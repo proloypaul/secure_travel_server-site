@@ -84,7 +84,15 @@ async function run() {
       const result = await exprerienceCollection.insertOne(travelerData)
       res.json(result)
       console.log("user data added result", result)
-  })
+    })
+
+    app.delete('/blogs/:id', async (req, res) => {
+      const id = req.params.id 
+      const query = {_id: ObjectId(id)}
+      const result = await exprerienceCollection.deleteOne(query)
+      console.log(result)
+      res.json(result)
+    })
 
     } finally {
     //   await client.close();
