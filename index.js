@@ -60,14 +60,27 @@ async function run() {
             isAdmin = true 
         }
         res.json({admin: isAdmin})
-    })
+      })
       // collect blog data from database
       app.get('/blogs', async(req, res) => {
+        const page = req.query.page;
+        const size = parseInt(req.query.size);
         const cursor = exprerienceCollection.find({})
-        const result = await cursor.toArray()
-        // console.log("collect blogs data")
-        res.json(result)
+        
+        const count = await cursor.count()
+        let result;
+        if(page){
+          result = await cursor.skip(page*size).limit(size).toArray()
+        }else{
+          result = await cursor.toArray()
+        }
+
+        res.json({
+          result,
+          count
+        })
       })
+
      app.get('/blogs/:id', async(req, res) => {
        const Id = req.params.id
       //  console.log("single blog id", Id)
@@ -90,7 +103,7 @@ async function run() {
       const id = req.params.id 
       const query = {_id: ObjectId(id)}
       const result = await exprerienceCollection.deleteOne(query)
-      console.log(result)
+      // console.log(result)
       res.json(result)
     })
 
